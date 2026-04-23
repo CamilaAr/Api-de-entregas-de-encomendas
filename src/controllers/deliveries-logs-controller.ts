@@ -50,6 +50,10 @@ class DeliveriesLogsController {
             },
         });
 
+        if (!delivery) {
+            throw new AppError("Delivery not found", 404);
+        }
+
         if (request.user?.role === "Customer" && request.user.id !== delivery?.userId) {
             throw new AppError("The user can only access their own deliveries", 403);
         }

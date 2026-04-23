@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
+import { AppError } from "@/utils/AppError";
 
 class DeliveriesStatusController {
     async update(request: Request, response: Response) {
@@ -14,6 +15,11 @@ class DeliveriesStatusController {
 
         const { id } = paramsSchema.parse(request.params);
         const { status } = bodySchema.parse(request.body);
+
+        const existing = await prisma.delivery.findUnique({ where: { id } });
+        if (!existing) {
+            throw new AppError("Delivery not found", 404);
+        }
 
         const delivery = await prisma.delivery.update({
             where: { id },
